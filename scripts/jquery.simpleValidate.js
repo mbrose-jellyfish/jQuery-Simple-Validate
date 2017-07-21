@@ -38,6 +38,7 @@
 			errorClass: 'error',
 			errorText: '{label} is a required field.',
 			emailErrorText: 'Please enter a valid {label}',
+            zipErrorText: 'Please enter a valid {label}',
 			errorElement: 'strong',
 			removeLabelChar: '*',
 			inputErrorClass: 'input-error',
@@ -55,6 +56,7 @@
 			// What type of error message is it
 			self.errorMsgType = self.config.errorText.search(/{label}/);
 			self.emailErrorMsgType = self.config.emailErrorText.search(/{label}/);
+            self.zipErrorMsgType = self.config.zipErrorText.search(/{label}/);
 			
 			self.$elem.on('submit.simpleValidate', $.proxy(self.handleSubmit, self));
 
@@ -77,14 +79,21 @@
 					errorMsg = self.formatErrorMsg(self.config.emailErrorText, labelText, self.emailErrorMsgType);
 					self.hasError = true;
 				}
-			}
+			} else if ($field.hasClass('zip')) {
+                if (!(/^\d{5}$/.test(fieldValue))) {
+                    errorMsg = self.formatErrorMsg(self.config.zipErrorText, labelText, self.zipErrorMsgType);
+                    self.hasError = true;
+                }
+            }
 			
 			//If there is an error, display it
 			if(errorMsg !== '') {
-			  $field.addClass(self.config.inputErrorClass).after('<' + self.config.errorElement + ' class="' + self.config.errorClass + '">' + errorMsg + '</' + self.config.errorElement + '>');
+			  $field.addClass(self.config.inputErrorClass);
+              if (self.config.errorElement != '') {
+                  $field.after('<' + self.config.errorElement + ' class="' + self.config.errorClass + '">' + errorMsg + '</' + self.config.errorElement + '>');
+              }
 			}
 		},
-		
 		formatErrorMsg: function(errorText, labelText, errorMsgType) {
 			return (errorMsgType > -1 ) ? errorText.replace('{label}', labelText) : errorText;
 		},
